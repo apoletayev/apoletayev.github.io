@@ -1,6 +1,6 @@
 theme: midnight
-plugins:
-- jekyll-remote-theme
+# plugins:
+# - jekyll-remote-theme
 
 title: Andrey's landing page
 tagline: Making materials move
