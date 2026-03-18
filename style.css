@@ -1,5 +1,6 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* body style. See also https://jgthms.com/web-design-in-4-minutes/ */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   background: #1a1a2e;
