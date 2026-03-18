@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Andrey Poletayev</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1><a href="#/">Andrey Poletayev</a></h1>
+    <nav>
+      <a href="#/">Home</a>
+      <a href="#/posts">Posts</a>
+    </nav>
+  </header>
+  <main id="app"></main>
+
+  <script src="libs/marked.js"></script>
+  <script>
+    const app = document.getElementById('app');
+
+    async function loadPosts() {
+      const res = await fetch('posts/index.json');
+      return res.json();
+    }
+
+    function renderHome() {
+      app.innerHTML = `
+        <div class="landing">
+          <h2>Making materials move</h2>
+          <p>I throw lasers and statistical mechanics at battery materials.</p>
+          <h3>Recent posts</h3>
+          <div id="recent-posts">Loading...</div>
+        </div>
+      `;
+      loadPosts().then(posts => {
+        const recent = posts.slice(0, 5);
+        document.getElementById('recent-posts').innerHTML = recent.length
+          ? renderPostList(recent)
+          : '<p>No posts yet.</p>';
+      });
+    }
+
+    function renderPostList(posts) {
+      return `<ul class="post-list">${posts.map(p => `
+        <li>
+          <span class="date">${p.date}</span><br>
+          <a class="title" href="#/post/${p.slug}">${p.title}</a><br>
+          <span class="desc">${p.description}</span>
+        </li>`).join('')}</ul>`;
+    }
+
+    function renderPostsPage() {
+      app.innerHTML = '<h2>All Posts</h2><div id="all-posts">Loading...</div>';
+      loadPosts().then(posts => {
+        posts.sort((a, b) => b.date.localeCompare(a.date));
+        document.getElementById('all-posts').innerHTML = posts.length
+          ? renderPostList(posts)
+          : '<p>No posts yet.</p>';
+      });
+    }
+
+    async function renderPost(slug) {
+      app.innerHTML = '<div class="post">Loading...</div>';
+      try {
+        const res = await fetch(`posts/${slug}.md`);
+        if (!res.ok) throw new Error('Post not found');
+        const md = await res.text();
+        app.innerHTML = `
+          <a class="back-link" href="#/posts">&larr; Back to posts</a>
+          <div class="post">${marked.parse(md)}</div>
+        `;
+      } catch (e) {
+        app.innerHTML = `<p class="error">Could not load post: ${e.message}</p>`;
+      }
+    }
+
+    function route() {
+      const hash = location.hash || '#/';
+      if (hash === '#/' || hash === '#') {
+        renderHome();
+      } else if (hash === '#/posts') {
+        renderPostsPage();
+      } else if (hash.startsWith('#/post/')) {
+        const slug = hash.replace('#/post/', '');
+        renderPost(slug);
+      } else {
+        app.innerHTML = '<p class="error">Page not found.</p>';
+      }
+    }
+
+    window.addEventListener('hashchange', route);
+    route();
+  </script>
+</body>
+</html>
