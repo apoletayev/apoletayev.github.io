@@ -1,0 +1,7 @@
+theme: midnight
+plugins:
+- jekyll-remote-theme
+
+title: Andrey's landing page
+tagline: Making materials move
+description: I throw lasers and statistical mechanics at battery materials.
